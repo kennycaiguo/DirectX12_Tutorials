@@ -23,6 +23,7 @@
     <ProjectGuid>{4AE3723F-B360-40D6-9D0B-A50D1FEAA725}</ProjectGuid>
     <RootNamespace>DiretX12XMMATRIX</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>DirectX12_XMMATRIX</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

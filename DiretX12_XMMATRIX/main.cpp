@@ -59,5 +59,10 @@ int main()
 	cout << "E = inverse(A) = " << endl << E << endl;
 	cout << "F = A*E = " << endl << F << endl;
 
+	cout << "--------------------------------------" << endl;
+	XMMATRIX p = XMMatrixPerspectiveFovLH(XM_PIDIV2, 4.0f / 3, 1, 11);
+	cout << "Perspective: " << endl;
+	cout << p << endl;
+
 	return 0;
 }
