@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX12_XMVECTOR", "DirectX12_Tutorial\DirectX12_Tutorial.vcxproj", "{9E90957A-ACAC-4131-BE78-9EBE05712FD5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiretX12_XMMATRIX", "DiretX12_XMMATRIX\DiretX12_XMMATRIX.vcxproj", "{4AE3723F-B360-40D6-9D0B-A50D1FEAA725}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX12_XMMATRIX", "DiretX12_XMMATRIX\DiretX12_XMMATRIX.vcxproj", "{4AE3723F-B360-40D6-9D0B-A50D1FEAA725}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX12_D3DApp", "DirectX12_D3DApp\DirectX12_D3DApp.vcxproj", "{C156D42D-D996-4E9C-B956-995D2941B012}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX12_Box", "DirectX12_Box\DirectX12_Box.vcxproj", "{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{C156D42D-D996-4E9C-B956-995D2941B012}.Release|x64.Build.0 = Release|x64
 		{C156D42D-D996-4E9C-B956-995D2941B012}.Release|x86.ActiveCfg = Release|Win32
 		{C156D42D-D996-4E9C-B956-995D2941B012}.Release|x86.Build.0 = Release|Win32
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Debug|x64.ActiveCfg = Debug|x64
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Debug|x64.Build.0 = Debug|x64
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Debug|x86.ActiveCfg = Debug|Win32
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Debug|x86.Build.0 = Debug|Win32
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Release|x64.ActiveCfg = Release|x64
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Release|x64.Build.0 = Release|x64
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Release|x86.ActiveCfg = Release|Win32
+		{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
