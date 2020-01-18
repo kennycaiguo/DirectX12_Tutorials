@@ -18,6 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\Source\d3dApp.cpp" />
+    <ClCompile Include="..\Common\Source\GameTimer.cpp" />
+    <ClCompile Include="BoxApp.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BoxApp.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}</ProjectGuid>
@@ -88,6 +97,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Common\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,17 +148,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\DirectX12_D3DApp\d3dApp.cpp" />
-    <ClCompile Include="..\DirectX12_D3DApp\GameTimer.cpp" />
-    <ClCompile Include="..\DirectX12_D3DApp\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\DirectX12_D3DApp\d3dApp.h" />
-    <ClInclude Include="..\DirectX12_D3DApp\d3dUtil.h" />
-    <ClInclude Include="..\DirectX12_D3DApp\d3dx12.h" />
-    <ClInclude Include="..\DirectX12_D3DApp\GameTimer.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
