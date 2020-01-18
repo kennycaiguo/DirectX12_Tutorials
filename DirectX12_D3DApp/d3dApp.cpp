@@ -199,29 +199,24 @@ void D3DApp::Draw()
 	ThrowIfFailed(mDirectCmdListAlloc->Reset());
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	D3D12_RESOURCE_BARRIER barrier;
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = CurrentBackBuffer();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	mCommandList->ResourceBarrier(1, &barrier);
-
 	mCommandList->RSSetViewports(1, &mScreenViewport);
 	mCommandList->RSSetScissorRects(1, &mScissorRect);
 
+	mCommandList->ResourceBarrier(1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_PRESENT,
+			D3D12_RESOURCE_STATE_RENDER_TARGET)
+	);
+
 	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), DirectX::Colors::LightSteelBlue, 0, nullptr);
 	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-	
 	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = CurrentBackBuffer();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	mCommandList->ResourceBarrier(1, &barrier);
+
+	mCommandList->ResourceBarrier(1, 
+		&CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT)
+	);
 
 	ThrowIfFailed(mCommandList->Close());
 	
@@ -477,16 +472,10 @@ void D3DApp::CreateDepthStencilView()
 	optClear.Format = mDepthStencilFormat;
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
-
-	D3D12_HEAP_PROPERTIES heapProperties;
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProperties.CreationNodeMask = 1;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProperties.VisibleNodeMask = 1;
 	
 	ThrowIfFailed(
-		md3dDevice->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, 
+		md3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), 
+			D3D12_HEAP_FLAG_NONE, &resourceDesc,
 			D3D12_RESOURCE_STATE_COMMON, &optClear, IID_PPV_ARGS(mDepthStencilBuffer.GetAddressOf()))
 	);
 	
@@ -497,14 +486,11 @@ void D3DApp::CreateDepthStencilView()
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 	md3dDevice->CreateDepthStencilView(mDepthStencilBuffer.Get(), &depthStencilViewDesc, DepthStencilView());
 
-	D3D12_RESOURCE_BARRIER barrier;
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = mDepthStencilBuffer.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	mCommandList->ResourceBarrier(1, &barrier);
+	mCommandList->ResourceBarrier(1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(mDepthStencilBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE)
+	);
 }
 
 void D3DApp::SetViewport()

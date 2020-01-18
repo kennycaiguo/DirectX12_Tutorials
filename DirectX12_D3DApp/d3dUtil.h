@@ -68,34 +68,22 @@ inline Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBuffer(
 	Microsoft::WRL::ComPtr<ID3D12Resource>& uploadBuffer)
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> defaultBuffer;
-	D3D12_HEAP_PROPERTIES heapProperties;
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProperties.CreationNodeMask = 1;
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProperties.VisibleNodeMask = 1;
-	
-	D3D12_RESOURCE_DESC resourceDesc;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resourceDesc.Alignment = 0;
-	resourceDesc.Width = byteSize;
-	resourceDesc.Height = 1;
-	resourceDesc.DepthOrArraySize = 1;
-	resourceDesc.MipLevels = 1;
-	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-	resourceDesc.SampleDesc = { 1, 0 };
-	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 	ThrowIfFailed(
-		device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, 
-			&resourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(defaultBuffer.GetAddressOf()))
+		device->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE, 
+			&CD3DX12_RESOURCE_DESC::Buffer(byteSize), 
+			D3D12_RESOURCE_STATE_COMMON, nullptr, 
+			IID_PPV_ARGS(defaultBuffer.GetAddressOf()))
 	);
 
-	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 	ThrowIfFailed(
-		device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf()))
+		device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(byteSize), 
+			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, 
+			IID_PPV_ARGS(uploadBuffer.GetAddressOf()))
 	);
 
 	D3D12_SUBRESOURCE_DATA subResourceData;
@@ -103,26 +91,19 @@ inline Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBuffer(
 	subResourceData.RowPitch = byteSize;
 	subResourceData.SlicePitch = byteSize;
 
-	D3D12_RESOURCE_BARRIER barrier;
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = defaultBuffer.Get();
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-	cmdList->ResourceBarrier(1, &barrier);
-
-	BYTE* pData;
-	ThrowIfFailed(
-		uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData))
+	cmdList->ResourceBarrier(1, 
+		&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_COPY_DEST)
 	);
-	memcpy(pData, initData, byteSize);
-	uploadBuffer->Unmap(0, nullptr);
-	cmdList->CopyBufferRegion(defaultBuffer.Get(), 0, uploadBuffer.Get(), 0, byteSize);
 
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	cmdList->ResourceBarrier(1, &barrier);
+	UpdateSubresources<1>(cmdList, defaultBuffer.Get(), uploadBuffer.Get(), 0, 0, 1, &subResourceData);
+
+	cmdList->ResourceBarrier(1, 
+		&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_GENERIC_READ)
+	);
 
 	return defaultBuffer;
 }

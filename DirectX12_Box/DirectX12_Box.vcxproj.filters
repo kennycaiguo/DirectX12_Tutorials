@@ -35,5 +35,8 @@
     <ClInclude Include="..\DirectX12_D3DApp\GameTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\DirectX12_D3DApp\d3dx12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
