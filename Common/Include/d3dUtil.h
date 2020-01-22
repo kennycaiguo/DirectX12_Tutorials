@@ -17,7 +17,6 @@
 #include <DirectXColors.h>
 #include "d3dx12.h"
 #include "MathHelper.h"
-#include "UploadBuffer.h"
 
 
 struct Vertex

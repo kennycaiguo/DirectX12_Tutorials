@@ -1,5 +1,6 @@
 #pragma once
 #include "d3dApp.h"
+#include "UploadBuffer.h"
 
 
 class BoxApp : public D3DApp
