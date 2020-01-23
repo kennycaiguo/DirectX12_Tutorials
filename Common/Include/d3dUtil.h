@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <fstream>
 #include <dxgi1_4.h>
 #include <d3d12.h>
 #include <d3dcompiler.h>
@@ -154,4 +155,20 @@ inline Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(
 	ThrowIfFailed(hr);
 	
 	return byteCode;
+}
+
+inline Microsoft::WRL::ComPtr<ID3DBlob> LoadBinary(std::wstring const& filename)
+{
+	std::ifstream fin(filename, std::ios::binary);
+	fin.seekg(0, std::ios_base::end);
+	std::fstream::pos_type size = (int)fin.tellg();
+	fin.seekg(0, std::ios_base::beg);
+
+	Microsoft::WRL::ComPtr<ID3DBlob> blob;
+	ThrowIfFailed(D3DCreateBlob(size, blob.GetAddressOf()));
+
+	fin.read((char*)blob->GetBufferPointer(), size);
+	fin.close();
+
+	return blob;
 }
