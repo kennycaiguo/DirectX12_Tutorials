@@ -14,8 +14,15 @@ protected:
 	virtual void Update();
 	virtual void OnMouseMove(WPARAM key, int x, int y);
 	void BuildConstantBuffers();
+	void BuildPipelineStateObject();
 
 private:
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode;
+	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO;
+
 	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCBVHeap;
 
