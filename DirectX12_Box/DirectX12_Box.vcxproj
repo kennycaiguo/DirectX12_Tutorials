@@ -27,6 +27,9 @@
   <ItemGroup>
     <ClInclude Include="BoxApp.h" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Shaders\color.hlsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{7866CB50-0A0C-4AEA-A238-D04CCE2B1EAD}</ProjectGuid>

@@ -14,6 +14,10 @@ public:
 	void Run();
 	
 protected:
+	float AspectRatio() const
+	{
+		return static_cast<float>(mClientWidth) / static_cast<float>(mClientHeight);
+	}
 	void CalculateFrameState();
 	virtual void Update();
 	virtual void Draw();
@@ -23,10 +27,10 @@ protected:
 	virtual void OnMouseDown(WPARAM key, int x, int y);
 	virtual void OnMouseUp(WPARAM key, int x, int y);
 	virtual void OnMouseMove(WPARAM key, int x, int y);
+	HWND mhMainWnd;
 
 private:
 	static D3DApp* mApp;
-	HWND mhMainWnd;
 	HINSTANCE mhAppInst;
 	GameTimer mTimer;
 	bool mAppPaused;

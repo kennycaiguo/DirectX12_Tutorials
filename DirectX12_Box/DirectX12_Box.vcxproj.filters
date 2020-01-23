@@ -32,4 +32,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Shaders\color.hlsl" />
+  </ItemGroup>
 </Project>

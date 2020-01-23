@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <array>
 #include <fstream>
 #include <unordered_map>
 #include <dxgi1_4.h>
