@@ -18,6 +18,7 @@ protected:
 	virtual void OnMouseDown(WPARAM key, int x, int y) override;
 	virtual void OnMouseUp(WPARAM key, int x, int y) override;
 	virtual void OnMouseMove(WPARAM key, int x, int y) override;
+	virtual void OnMouseWheel(float delta, int x, int y) override;
 
 	void BuildDesciptorHeaps();
 	void BuildConstantBuffers();

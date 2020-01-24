@@ -1,6 +1,7 @@
 #include "BoxApp.h"
 
 using namespace DirectX;
+using namespace Microsoft::WRL;
 
 
 BoxApp::BoxApp(HINSTANCE hInstance)
@@ -37,7 +38,52 @@ void BoxApp::OnResize()
 
 void BoxApp::Draw()
 {
-	Super::Draw();
+	ThrowIfFailed(mDirectCmdListAlloc->Reset());
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
+	mCommandList->RSSetViewports(1, &mScreenViewport);
+	mCommandList->RSSetScissorRects(1, &mScissorRect);
+	mCommandList->ResourceBarrier(1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)
+	);
+	mCommandList->ClearRenderTargetView(CurrentBackBufferView(),
+		Colors::LightSteelBlue, 0, nullptr);
+	mCommandList->ClearDepthStencilView(DepthStencilView(),
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+		1.0f, 0, 0, nullptr);
+
+	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(),
+		true, &DepthStencilView());
+
+	ID3D12DescriptorHeap* descriptorHeap[] = { mCBVHeap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
+
+	mCommandList->IASetVertexBuffers(0, 1, &mBoxGeo->VertexBufferView());
+	mCommandList->IASetIndexBuffer(&mBoxGeo->IndexBufferView());
+	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	mCommandList->SetGraphicsRootDescriptorTable(
+		0, mCBVHeap->GetGPUDescriptorHandleForHeapStart());
+	mCommandList->DrawIndexedInstanced(
+		mBoxGeo->DrawArgs["box"].IndexCount,
+		1, 0, 0, 0
+	);
+	mCommandList->ResourceBarrier(1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)
+	);
+	
+	ThrowIfFailed(mCommandList->Close());
+
+	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+
+	ThrowIfFailed(mdxgiSwapChain->Present(0, 0));
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+
+	FlushCommandQueue();
 }
 
 void BoxApp::Update()
@@ -80,20 +126,26 @@ void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
 	{
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
-		mTheta += dx;
-		mPhi += dy;
+		mTheta -= dx;
+		mPhi -= dy;
 		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::PI - 0.1f);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
-		float dx = 0.005f * XMConvertToRadians(static_cast<float>(x - mLastMousePos.x));
-		float dy = 0.005f * XMConvertToRadians(static_cast<float>(y - mLastMousePos.y));
+		float dx = 0.05f * XMConvertToRadians(static_cast<float>(x - mLastMousePos.x));
+		float dy = 0.05f * XMConvertToRadians(static_cast<float>(y - mLastMousePos.y));
 		mRadius += dx - dy;
 		mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
 	}
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+}
+
+void BoxApp::OnMouseWheel(float delta, int x, int y)
+{
+	mRadius += 0.005f * delta;
+	mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
 }
 
 void BoxApp::BuildDesciptorHeaps()
@@ -124,6 +176,24 @@ void BoxApp::BuildRootSignature()
 	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
 	CD3DX12_DESCRIPTOR_RANGE cbvTable;
 	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	ComPtr<ID3DBlob> serializeRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializeRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+	ThrowIfFailed(md3dDevice->CreateRootSignature(
+		0, serializeRootSig->GetBufferPointer(),
+		serializeRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&mRootSignature))
+	);
 }
 
 void BoxApp::BuildShadersAndInputLayout()

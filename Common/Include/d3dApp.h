@@ -27,6 +27,7 @@ protected:
 	virtual void OnMouseDown(WPARAM key, int x, int y);
 	virtual void OnMouseUp(WPARAM key, int x, int y);
 	virtual void OnMouseMove(WPARAM key, int x, int y);
+	virtual void OnMouseWheel(float delta, int x, int y);
 	HWND mhMainWnd;
 
 private:
@@ -81,7 +82,7 @@ protected:
 	DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
-	UINT mClientWidth = 1920;
-	UINT mClientHeight = 1080;
+	UINT mClientWidth = 1024;
+	UINT mClientHeight = 768;
 	std::wstring mMainWndCaption = L"D3D App";
 };
