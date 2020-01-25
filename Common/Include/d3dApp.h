@@ -28,9 +28,8 @@ protected:
 	virtual void OnMouseUp(WPARAM key, int x, int y);
 	virtual void OnMouseMove(WPARAM key, int x, int y);
 	virtual void OnMouseWheel(float delta, int x, int y);
+	
 	HWND mhMainWnd;
-
-private:
 	static D3DApp* mApp;
 	HINSTANCE mhAppInst;
 	GameTimer mTimer;

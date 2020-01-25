@@ -23,6 +23,16 @@
 #include "MathHelper.h"
 
 
+struct VPosData
+{
+	DirectX::XMFLOAT3 Pos;
+};
+
+struct VColorData
+{
+	DirectX::XMFLOAT4 Color;
+};
+
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
@@ -32,6 +42,8 @@ struct Vertex
 struct ObjectConstants
 {
 	DirectX::XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4 gPulseColor;
+	float gTime;
 };
 
 inline std::wstring AnsiToWString(const std::string& str)
