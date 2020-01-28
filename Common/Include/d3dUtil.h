@@ -39,11 +39,34 @@ struct Vertex
 	DirectX::XMFLOAT4 Color;
 };
 
-struct ObjectConstants
+struct ObjectConstants_
 {
 	DirectX::XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4 gPulseColor;
 	float gTime;
+};
+
+struct ObjectConstants
+{
+	DirectX::XMFLOAT4X4 World;
+};
+
+struct PassConstants
+{
+	DirectX::XMFLOAT4X4 View;
+	DirectX::XMFLOAT4X4 InvView;
+	DirectX::XMFLOAT4X4 Proj;
+	DirectX::XMFLOAT4X4 InvProj;
+	DirectX::XMFLOAT4X4 ViewProj;
+	DirectX::XMFLOAT4X4 InvViewProj;
+	DirectX::XMFLOAT3 EyePos;
+	FLOAT cbPerObjectPad1;
+	DirectX::XMFLOAT2 RenderTargetSize;
+	DirectX::XMFLOAT2 InvRenderTagetSize;
+	FLOAT NearZ;
+	FLOAT FarZ;
+	FLOAT TotalTime;
+	FLOAT DeltaTime;
 };
 
 inline std::wstring AnsiToWString(const std::string& str)
