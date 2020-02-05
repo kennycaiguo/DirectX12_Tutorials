@@ -29,6 +29,8 @@ protected:
 	virtual void Draw() override;
 
 private:
+	void BuildShapeGeometry();
+	void BuildRenderItems();
 	void BuildFrameResources();
 	void UpdateObjectCBs();
 	void UpdateMainPassCB();
@@ -47,4 +49,8 @@ private:
 
 	PassConstants mMainPassCB;
 	DirectX::XMFLOAT3 mEyePos;
+
+	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> mShaders;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> mPSOs;
 };
