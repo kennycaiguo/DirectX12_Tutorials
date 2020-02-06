@@ -214,6 +214,87 @@ void ShapesApp::BuildRenderItems()
 	}
 }
 
+void ShapesApp::BuildDescriptorHeaps()
+{
+	UINT objCount = (UINT)mOpaqueRenderItems.size();
+	UINT numDescriptors = (objCount + 1) * gNumFrameResources;
+	mPassCBVOffset = objCount * gNumFrameResources;
+
+	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
+	cbvHeapDesc.NumDescriptors = numDescriptors;
+	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	cbvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(
+		md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCBVHeap))
+	);
+}
+
+void ShapesApp::BuildConstantBufferViews()
+{
+	UINT objCBByteSize = CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	UINT objCount = (UINT)mOpaqueRenderItems.size();
+
+	for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
+	{
+		auto objectCB = mFrameResources[frameIndex]->ObjectCB->Resource();
+		for (UINT i = 0; i < objCount; ++i)
+		{
+			D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objectCB->GetGPUVirtualAddress();
+			cbAddress += i * objCBByteSize;
+			int heapIndex = frameIndex * objCount + i;
+			auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCBVHeap->GetCPUDescriptorHandleForHeapStart());
+			handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+
+			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+			cbvDesc.BufferLocation = cbAddress;
+			cbvDesc.SizeInBytes = objCBByteSize;
+
+			md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+		}
+	}
+
+	UINT passCBByteSize = CalcConstantBufferByteSize(sizeof(PassConstants));
+
+	for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
+	{
+		auto passCB = mFrameResources[frameIndex]->PassCB->Resource();
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
+
+		int heapIndex = mPassCBVOffset + frameIndex;
+		auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCBVHeap->GetCPUDescriptorHandleForHeapStart());
+		handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+		cbvDesc.BufferLocation = cbAddress;
+		cbvDesc.SizeInBytes = passCBByteSize;
+
+		md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+	}
+}
+
+void ShapesApp::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& items)
+{
+	UINT objCBByteSize = CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	auto objectCB = mCurrentFrameResource->ObjectCB->Resource();
+
+	for (std::size_t i = 0; i < items.size(); ++i)
+	{
+		auto renderItem = items[i];
+		cmdList->IASetVertexBuffers(0, 1, &renderItem->Geo->VertexBufferView());
+		cmdList->IASetIndexBuffer(&renderItem->Geo->IndexBufferView());
+		cmdList->IASetPrimitiveTopology(renderItem->PrimitiveTopology);
+
+		UINT cbvIndex = mCurrentFrameResourceIndex * (UINT)mOpaqueRenderItems.size() + renderItem->ObjCBIndex;
+		auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCBVHeap->GetGPUDescriptorHandleForHeapStart());
+		handle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
+
+		cmdList->SetGraphicsRootDescriptorTable(0, handle);
+		cmdList->DrawIndexedInstanced(renderItem->IndexCount, 1, 
+			renderItem->StartIndexLocation, renderItem->BaseVertexLocation, 0);
+	}
+}
+
 void ShapesApp::BuildFrameResources()
 {
 	for (int i = 0; i < gNumFrameResources; ++i)

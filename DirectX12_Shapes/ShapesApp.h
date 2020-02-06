@@ -31,6 +31,9 @@ protected:
 private:
 	void BuildShapeGeometry();
 	void BuildRenderItems();
+	void BuildDescriptorHeaps();
+	void BuildConstantBufferViews();
+	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& items);
 	void BuildFrameResources();
 	void UpdateObjectCBs();
 	void UpdateMainPassCB();
@@ -49,6 +52,9 @@ private:
 
 	PassConstants mMainPassCB;
 	DirectX::XMFLOAT3 mEyePos;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCBVHeap;
+	UINT mPassCBVOffset;
 
 	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> mShaders;

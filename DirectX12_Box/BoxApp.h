@@ -35,7 +35,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO;
 	std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
-	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
+	std::unique_ptr<UploadBuffer<ObjectConstants_>> mObjectCB = nullptr;
 
 	DirectX::XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 mWorld = MathHelper::Identity4x4();

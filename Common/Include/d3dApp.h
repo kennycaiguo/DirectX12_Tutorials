@@ -74,6 +74,7 @@ protected:
 	UINT mCurrBackBuffer = 0;
 	UINT mRTVDescriptorSize;
 	UINT mDSVDescriptorSize;
+	UINT mCbvSrvUavDescriptorSize;
 	UINT64 mCurrentFence = 0;
 	D3D12_VIEWPORT mScreenViewport;
 	D3D12_RECT mScissorRect;

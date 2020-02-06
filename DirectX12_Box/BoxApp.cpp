@@ -103,7 +103,7 @@ void BoxApp::Update()
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX worldViewProj = world * view * proj;
 
-	ObjectConstants objConstants;
+	ObjectConstants_ objConstants;
 	XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
 	objConstants.gTime = mTimer.TotalTime();
 	objConstants.gPulseColor = XMFLOAT4(Colors::Brown);
@@ -164,8 +164,8 @@ void BoxApp::BuildDesciptorHeaps()
 
 void BoxApp::BuildConstantBuffers()
 {
-	mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(md3dDevice.Get(), 1, true);
-	UINT objCBByteSize = CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	mObjectCB = std::make_unique<UploadBuffer<ObjectConstants_>>(md3dDevice.Get(), 1, true);
+	UINT objCBByteSize = CalcConstantBufferByteSize(sizeof(ObjectConstants_));
 	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = mObjectCB->Resource()->GetGPUVirtualAddress();
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = cbAddress;
