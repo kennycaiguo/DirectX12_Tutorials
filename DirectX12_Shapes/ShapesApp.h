@@ -56,6 +56,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCBVHeap;
 	UINT mPassCBVOffset;
 
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
+
+	bool mIsWireframe;
+
 	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> mShaders;
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> mPSOs;
